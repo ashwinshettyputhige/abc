@@ -1,0 +1,156 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:registration/register.dart';
+import 'employeeDrawer.dart';
+import 'dart:async';
+import 'dart:convert';
+import "package:dio/dio.dart";
+class LoginFormPage extends StatefulWidget {
+  @override
+  _LoginFormPageState createState() => _LoginFormPageState();
+}
+
+class _LoginFormPageState extends State<LoginFormPage> {
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  // Map<String,String> header={"Content-Type":"application/jason"};
+  void login() async {
+    try{
+      final response = await Dio().post(
+        'http://localhost:8080/login',
+        data: {
+          'name': _usernameController.text,
+          'password': _passwordController.text,
+        },
+      );
+
+      // var response = await Dio().get('http://localhost:8080/login');
+      if(response.statusCode ==200){
+        var res=response.data;
+        print(res);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (ctx){
+
+              return employeeDrawer();
+            }
+        )
+        );
+          print(response.statusCode);
+      }else
+      {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Alert'),
+              content: Text('Invalid username and password'),
+              actions: <Widget>[
+                ElevatedButton(onPressed: (){
+              Navigator.of(context).pop();}, child: Text('OK'))
+
+              ],
+            );
+          },
+        );
+      }
+    }
+    catch(e)
+      {
+        print(e);
+      }
+
+    // String username = _usernameController.text;
+    // String password = _passwordController.text;
+    // var data={'name': '$username', 'password': '$password'};
+    // var body=json.encode(data);
+    // Make an HT TPrequest to the server
+    // var response = await http.post(
+    //   Uri.parse('http://localhost:8080/login'),headers:header ,
+    //   body: body
+    //
+    // );
+    // final url = Uri.parse('http://localhost:8080/login');
+    // final response = await http.post(
+    //   url,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: jsonEncode({
+    //     "name": "ashwin",
+    //     "password": "shetty"
+    //   }),
+    // );
+    //
+    // print("response $response ");
+    //
+    // // Process the response
+    // if (response.statusCode == 200) {
+    //   Navigator.of(context).push(MaterialPageRoute(
+    //     builder: (ctx){
+    //
+    //       return employeeDrawer();},
+    //
+    //   )
+    //   );
+    // } else {
+    //   Navigator.of(context).push(MaterialPageRoute(
+    //     builder: (ctx){
+    //       return LoginFormPage();},
+    //   )
+    //   );
+    // }
+
+    // return response;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // appBar: AppBar(
+      //   title: Text('Login Form'),
+      // ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                  color:Colors.blue,
+                  width: double.infinity,
+                  child: Text('Login Form',style:TextStyle(fontWeight: FontWeight.bold,fontSize: 40,color: Colors.white,fontStyle: FontStyle.italic))),
+            ),
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(labelText: 'Username',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(borderSide: BorderSide(width: 3,color: Colors.white))),
+              ),
+              SizedBox(height: 16.0),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(labelText: 'Password', border: OutlineInputBorder(),),
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: login
+                ,
+                child: Text('Login'),
+              ),
+            TextButton(onPressed: (){Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx){
+
+                  return Register();
+                }
+            )
+            );
+            }, child: Text("Don't have an account? Sign up"))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
